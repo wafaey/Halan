@@ -6,31 +6,23 @@ import {
   InfoWindow,
   Polygon,
 } from "@react-google-maps/api";
-import mapStyles from "./mapStyles";
 import Snackbar from '@material-ui/core/Snackbar';
 import NewPolygon from "../../Components/Maps/NewPolygon/NewPolygon";
 import DeletePolygon from "../../Components/Maps/DeletePolygon/DeletePolygon";
-// import EditPolygon from "../../Components/Maps/EditPolygon/EditPolygon";
+import zoneAPIs from "../../APIs/ZonesAPIs/zonesAPIs";
 import './Maps.css';
+
 const mapContainerStyle = {
   height: "85vh",
   width: "100vw",
 };
 const options = {
-  styles: mapStyles,
   disableDefaultUI: true,
   zoomControl: true,
 };
 const center = { lat: 30.033333, lng: 31.233334 };
-const triangleCoords = [
-  { _id:434334,lat: 25.774, lng: -80.19 },
-  { _id:434334,lat: 18.466, lng: -66.118 },
-  { _id:434334,lat: 32.321, lng: -64.757 },
-  { _id:434334, lat: 25.774, lng: -80.19 },
-];
 const apiKey = "AIzaSyB_y1V08dj1ruvJ7Su9y3aPfKEBvd7lJzY";
 const libraries= ['places'];
-const token = localStorage.getItem('access_token');
 const Maps= () => {
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: apiKey,
@@ -44,32 +36,21 @@ const Maps= () => {
   useEffect(()=>{
     getZones();
   },[]);
-  const getZones=()=>{
-    const requestOptions = {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json',
-        'Authorization': token
-         }
-    };
-      fetch("https://zones-backend-halan.herokuapp.com/Zones", requestOptions)
-      .then(res => res.json())
-      .then(
-        (result) => {
-          console.log('result',result.data);
-    
-          let hete =result.data;
-          for(let i=0;i<result.data.length;i++){
-            for(let j=0;j<result.data[i].points.length;j++){
-              result.data[i].points[j]['lat']=parseFloat(result.data[i].points[j]['lat']);
-              result.data[i].points[j]['lng']=parseFloat(result.data[i].points[j]['lng']);
+  async function getZones(){
+   var result = await zoneAPIs.callGetZones(1);
+    if(result?.length>0){
+          let hete =result;
+          for(let i=0;i<result.length;i++){
+            for(let j=0;j<result[i].points.length;j++){
+              result[i].points[j]['lat']=parseFloat(result[i].points[j]['lat']);
+              result[i].points[j]['lng']=parseFloat(result[i].points[j]['lng']);
             }
           }
           setZones(hete);
-        },
-        (error) => {
-        console.log('error',error);
+        }else if(result){
+          setMsg(result);
+          setOpen(true);
         }
-      )
 }
   const onMapClick = React.useCallback((e) => {
     setMarkers((current) => [
@@ -127,8 +108,8 @@ const Maps= () => {
          strokeOpacity= {0.8}
          strokeWeight= {4}
        //  fillColor= {`${zone.color}`}
-         fillColor= {zone.color}
-         fillOpacity= {0.35}
+        //  fillColor= {zone.color}
+        //  fillOpacity= {0.35}
         //  key={zone._id}
          onClick={() => {
             setSelected(zone);

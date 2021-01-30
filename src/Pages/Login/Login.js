@@ -6,7 +6,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import {useHistory} from "react-router-dom";
 import Snackbar from '@material-ui/core/Snackbar';
-// import axios from 'axios'
+import zoneAPIs from "../../APIs/ZonesAPIs/zonesAPIs";
 import './Login.css';
 
 const useStyles = makeStyles((theme) => ({
@@ -35,27 +35,14 @@ const Login= () => {
   const [password, setPassword ]=useState('');
   const [msg, setMsg ]=useState('');
   const [open, setOpen] = React.useState(false);
-  const userLogin = ()=>{
-    const requestOptions = {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-     // body: JSON.stringify({username: userName, password: password})
-       body: JSON.stringify({username: "omar.mohamed", password: 'halan_2021'})
-  };
-    fetch("https://zones-backend-halan.herokuapp.com/login", requestOptions)
-    .then(res => res.json())
-    .then(
-      (result) => {
-      localStorage.setItem('access_token', `bearer ${result.token}`);
-      setMsg(result.message);
-      setOpen(true);
+  async function userLogin(){
+   var result = await zoneAPIs.callUserLogin(userName,password,1);
+   if(result==='Auth sucessful'){
       history.push('/maps');
-      },
-      (error) => {
-        setMsg(error.message);
+      }else if(result){
+        setMsg(result);
         setOpen(true);
       }
-    )
   }
   const handleClose = () => {
     setOpen(false);

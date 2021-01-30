@@ -2,6 +2,7 @@ import React,{useState, useEffect} from 'react';
 import Button from '@material-ui/core/Button';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
+import zoneAPIs from "../../../APIs/ZonesAPIs/zonesAPIs";
 
 const useStyles = makeStyles((theme) => ({
     paper: {
@@ -22,30 +23,18 @@ const useStyles = makeStyles((theme) => ({
       margin: theme.spacing(3, 0, 2),
     },
   }));
-const token = localStorage.getItem('access_token');
 const DeletePolygon = ({zoneID,getZones,handleClose,setMsg,setOpen,setSelected})=>{
-    const deletePolygon=()=>{
-        const requestOptions = {
-            method: 'Delete',
-            headers: { 'Content-Type': 'application/json',
-            'Authorization': token
-             },
-        };
-          fetch(`https://zones-backend-halan.herokuapp.com/Zones/${zoneID}`, requestOptions)
-          .then(res => res.json())
-          .then(
-            (result) => {
-                setMsg(result.message);
-                setOpen(true);
-                getZones();
-                setSelected(null)
-            },
-            (error) => {
-                console.log(error);
-                setMsg(error.message);
-                setOpen(true);
-            }
-          )
+  async function  deletePolygon(){
+    var result = await zoneAPIs.callDeletePolygon(zoneID, 1);
+    if(result && result==='zone deleted'){
+      setMsg(result);
+      setOpen(true);
+      getZones();
+      setSelected(null)
+    }else if(result){
+      setMsg(result);
+      setOpen(true);
+    }  
     }
     return(
         <div className='polygon'>

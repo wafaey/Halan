@@ -3,6 +3,7 @@ import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
+import zoneAPIs from "../../../APIs/ZonesAPIs/zonesAPIs";
 import './NewPolygon.css';
 
 const useStyles = makeStyles((theme) => ({
@@ -24,37 +25,26 @@ const useStyles = makeStyles((theme) => ({
       margin: theme.spacing(3, 0, 2),
     },
   }));
-const token = localStorage.getItem('access_token');
+
 const NewPolygon = ({polygonPoints,setMarkers,getZones,handleClose,setMsg,setOpen})=>{
     const [polygonName, setPolygonName ]=useState('');
     const [polygonColor, setPolygonColor ]=useState('');
-    const createPolygon=()=>{
-        console.log(polygonPoints);
-        const requestOptions = {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json',
-            'Authorization': token
-             },
-             body: JSON.stringify({label:polygonName,color:polygonColor,points:polygonPoints})
-        };
-          fetch("https://zones-backend-halan.herokuapp.com/Zones", requestOptions)
-          .then(res => res.json())
-          .then(
-            (result) => {
-                setMarkers([]);
-                setPolygonName('');
-                setPolygonColor('');
-                setMsg(result.message);
-                setOpen(true);
-                getZones();
-            },
-            (error) => {
-                console.log(error);
-                setMsg(error.message);
-                setOpen(true);
-            }
-          )
-    }
+    // const [result, setResult ]=useState(null);
+    
+    async function createPolygon() {
+       var result=await zoneAPIs.callCreatePolygon(polygonName, polygonColor, polygonPoints, 1);
+       if(result && result==='zone created!'){
+        setMarkers([]);
+        setPolygonName('');
+        setPolygonColor('');
+        setMsg(result);
+        setOpen(true);
+        getZones();
+       }else if(result){
+        setMsg(result);
+        setOpen(true);
+       }  
+  }
   
     return(
         <div className='polygon'>
@@ -77,7 +67,7 @@ const NewPolygon = ({polygonPoints,setMarkers,getZones,handleClose,setMsg,setOpe
             required
             fullWidth
             id="color"
-            label="Polygon color"
+            label="Polygon Hex color"
             value={polygonColor}
             onChange={(e)=>setPolygonColor(e.target.value)}
             autoFocus
@@ -100,7 +90,7 @@ const NewPolygon = ({polygonPoints,setMarkers,getZones,handleClose,setMsg,setOpe
             className={useStyles.submit}
             onClick={()=>setMarkers([])}
           >
-           Remove Points
+           Remove Markers
           </Button>
          </div>
       </div>
