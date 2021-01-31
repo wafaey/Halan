@@ -39,9 +39,11 @@ const Login= () => {
    var result = await zoneAPIs.callUserLogin(userName,password,1);
    if(result==='Auth sucessful'){
       history.push('/maps');
+      return result;
       }else if(result){
         setMsg(result);
         setOpen(true);
+        return result;
       }
   }
   const handleClose = () => {

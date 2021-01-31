@@ -2,7 +2,7 @@ import Login from '../Pages/Login/Login';
 import Maps from '../Pages/Maps/Maps';
 
 
-export default [
+const routes= [
     {
         name: "Login", path: "/", component: Login, exact: true
     },
@@ -11,3 +11,5 @@ export default [
     },
 
 ];
+
+export default routes;

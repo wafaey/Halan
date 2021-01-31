@@ -1,4 +1,4 @@
-import React,{useState, useEffect} from 'react';
+import React,{useState} from 'react';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import { makeStyles } from '@material-ui/core/styles';
@@ -26,28 +26,32 @@ const useStyles = makeStyles((theme) => ({
     },
   }));
 
-const NewPolygon = ({polygonPoints,setMarkers,getZones,handleClose,setMsg,setOpen})=>{
+const NewPolygon = ({polygonPoints,setMarkers,getZones,handleClose,setMsg,setOpen,setOpenLoading})=>{
     const [polygonName, setPolygonName ]=useState('');
     const [polygonColor, setPolygonColor ]=useState('');
-    // const [result, setResult ]=useState(null);
-    
     async function createPolygon() {
+      setOpenLoading(true);
        var result=await zoneAPIs.callCreatePolygon(polygonName, polygonColor, polygonPoints, 1);
        if(result && result==='zone created!'){
         setMarkers([]);
         setPolygonName('');
         setPolygonColor('');
-        setMsg(result);
-        setOpen(true);
         getZones();
+        setMsg(result);
+        setOpenLoading(false);
+        setOpen(true);
+        return result;
        }else if(result){
         setMsg(result);
+        setOpenLoading(false);
         setOpen(true);
+        return result;
        }  
   }
   
     return(
         <div className='polygon'>
+          <h3>N.B. : To delete a zone select it</h3>
    <Container component="main" maxWidth="xs">
       <div className={useStyles.paper}>
           <TextField

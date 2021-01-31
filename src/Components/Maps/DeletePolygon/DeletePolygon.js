@@ -1,4 +1,4 @@
-import React,{useState, useEffect} from 'react';
+import React from 'react';
 import Button from '@material-ui/core/Button';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
@@ -23,17 +23,22 @@ const useStyles = makeStyles((theme) => ({
       margin: theme.spacing(3, 0, 2),
     },
   }));
-const DeletePolygon = ({zoneID,getZones,handleClose,setMsg,setOpen,setSelected})=>{
+const DeletePolygon = ({zoneID,getZones,handleClose,setMsg,setOpen,setSelected,setOpenLoading})=>{
   async function  deletePolygon(){
+    setOpenLoading(true);
     var result = await zoneAPIs.callDeletePolygon(zoneID, 1);
     if(result && result==='zone deleted'){
       setMsg(result);
-      setOpen(true);
       getZones();
-      setSelected(null)
+      setSelected(null);
+      setOpenLoading(false);
+      setOpen(true);
+      return result;
     }else if(result){
       setMsg(result);
+      setOpenLoading(false);
       setOpen(true);
+      return result;
     }  
     }
     return(

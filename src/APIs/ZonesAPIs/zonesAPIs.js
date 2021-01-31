@@ -19,7 +19,7 @@
         (error) => {
             if(numOfRetries===1){
                 callUserLogin=(userName,password,2);
-            }{
+            }else{
                 reject(error.message)
                 return error.message;
             }
@@ -46,7 +46,7 @@
         (error) => {
             if(numOfRetries===1){
                 callCreatePolygon=(polygonName,polygonColor,polygonPoints,2);
-            }{
+            }else{
                 reject(error.message)
                 return error.message;
             }
@@ -72,7 +72,7 @@ const callDeletePolygon=(zoneID,numOfRetries)=>{
         (error) => {
             if(numOfRetries===1){
                 callDeletePolygon=(zoneID,2);
-            }{
+            }else{
                 reject(error.message)
                 return error.message;
             }
@@ -99,7 +99,7 @@ const callGetZones =(numOfRetries)=>{
         (error) => {
             if(numOfRetries===1){
                 callGetZones=(2);
-            }{
+            }else{
                 reject(error.message)
                 return error.message;
             }

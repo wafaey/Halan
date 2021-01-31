@@ -9,7 +9,9 @@ import {
 import Snackbar from '@material-ui/core/Snackbar';
 import NewPolygon from "../../Components/Maps/NewPolygon/NewPolygon";
 import DeletePolygon from "../../Components/Maps/DeletePolygon/DeletePolygon";
+import ExportFile from "../../Components/Maps/ExportFile/ExportFile";
 import zoneAPIs from "../../APIs/ZonesAPIs/zonesAPIs";
+import CircularProgress from '@material-ui/core/CircularProgress';
 import './Maps.css';
 
 const mapContainerStyle = {
@@ -33,10 +35,12 @@ const Maps= () => {
   const [selected, setSelected] = React.useState(null);
   const [msg, setMsg ]=React.useState('');
   const [open, setOpen] = React.useState(false);
+  const [openLoading, setOpenLoading] = React.useState(false);
   useEffect(()=>{
     getZones();
   },[]);
   async function getZones(){
+    setOpenLoading(true);
    var result = await zoneAPIs.callGetZones(1);
     if(result?.length>0){
           let hete =result;
@@ -47,6 +51,7 @@ const Maps= () => {
             }
           }
           setZones(hete);
+          setOpenLoading(false);
         }else if(result){
           setMsg(result);
           setOpen(true);
@@ -68,10 +73,6 @@ const Maps= () => {
     mapRef.current = map;
   }, []);
 
-  // const panTo = React.useCallback(({ lat, lng }) => {
-  //   mapRef.current.panTo({ lat, lng });
-  //   mapRef.current.setZoom(14);
-  // }, []);
   const handleClose = () => {
     setOpen(false);
   };
@@ -85,7 +86,7 @@ const Maps= () => {
         onClose={handleClose}
         message={msg}
       />
- <GoogleMap
+     <GoogleMap
         id="map"
         mapContainerStyle={mapContainerStyle}
         zoom={12}
@@ -103,14 +104,11 @@ const Maps= () => {
         {zones.map((zone) => (
         <Polygon
          paths= {zone.points}
-        // strokeColor={`${zone.color}`}
-         strokeColor='#B32F25'
+         strokeColor={zone.color}
          strokeOpacity= {0.8}
          strokeWeight= {4}
-       //  fillColor= {`${zone.color}`}
-        //  fillColor= {zone.color}
-        //  fillOpacity= {0.35}
-        //  key={zone._id}
+         fillColor= {zone.color}
+         fillOpacity= {0.35}
          onClick={() => {
             setSelected(zone);
          }} 
@@ -131,10 +129,19 @@ const Maps= () => {
           setMsg={setMsg}
           setOpen={setOpen}
           setSelected={setSelected}
+          setOpenLoading={setOpenLoading}
           />
           </div>
         </InfoWindow>:null}
       </GoogleMap>
+{  openLoading? 
+<div className="progress">
+  <CircularProgress/>
+  </div>
+     :<div>
+      <ExportFile
+      zones={zones}
+      />
       <NewPolygon
       polygonPoints={markers}
       setMarkers={setMarkers}
@@ -142,8 +149,9 @@ const Maps= () => {
       handleClose={handleClose}
       setMsg={setMsg}
       setOpen={setOpen}
+      setOpenLoading={setOpenLoading}
       />
-
+      </div>}
     </div>
       );
 }
