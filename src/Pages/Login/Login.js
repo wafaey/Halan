@@ -7,6 +7,7 @@ import Container from '@material-ui/core/Container';
 import {useHistory} from "react-router-dom";
 import Snackbar from '@material-ui/core/Snackbar';
 import zoneAPIs from "../../APIs/ZonesAPIs/zonesAPIs";
+import CircularProgress from '@material-ui/core/CircularProgress';
 import './Login.css';
 
 const useStyles = makeStyles((theme) => ({
@@ -35,13 +36,17 @@ const Login= () => {
   const [password, setPassword ]=useState('');
   const [msg, setMsg ]=useState('');
   const [open, setOpen] = React.useState(false);
+  const [openLoading, setOpenLoading] = React.useState(false);
   async function userLogin(){
+    setOpenLoading(true);
    var result = await zoneAPIs.callUserLogin(userName,password,1);
    if(result==='Auth sucessful'){
       history.push('/maps');
+      setOpenLoading(false);
       return result;
       }else if(result){
         setMsg(result);
+        setOpenLoading(false);
         setOpen(true);
         return result;
       }
@@ -57,7 +62,10 @@ const Login= () => {
         onClose={handleClose}
         message={msg}
       />
-      <div className={useStyles.paper}>
+      {openLoading?
+      <div className="progress">
+       <CircularProgress/>
+       </div>:<div className={useStyles.paper}>
         <Typography component="h1" variant="h5">
           Sign in
         </Typography>
@@ -96,7 +104,7 @@ const Login= () => {
             Sign In
           </Button>
 
-      </div>
+      </div>}
     </Container>
     </div>
   );
